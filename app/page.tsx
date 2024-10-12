@@ -5,8 +5,14 @@
 import * as fal from "@fal-ai/serverless-client";
 import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { ModelIcon } from "@/components/icons/model-icon";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { DownloadIcon, ChevronDownIcon } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const DEFAULT_PROMPT =
   "A cinematic shot of a baby raccoon wearing an intricate italian priest robe";
@@ -30,6 +36,7 @@ const INPUT_DEFAULTS = {
 
 export default function Lightning() {
   const [image, setImage] = useState<null | string>(null);
+  const [imageBlob, setImageBlob] = useState<Blob | null>(null);
   const [prompt, setPrompt] = useState<string>(DEFAULT_PROMPT);
   const [seed, setSeed] = useState<string>(randomSeed());
   const [inferenceTime, setInferenceTime] = useState<number>(NaN);
@@ -39,6 +46,7 @@ export default function Lightning() {
     throttleInterval: 64,
     onResult: (result) => {
       const blob = new Blob([result.images[0].content], { type: "image/jpeg" });
+      setImageBlob(blob);
       setImage(URL.createObjectURL(blob));
       setInferenceTime(result.timings.inference);
     },
@@ -75,10 +83,56 @@ export default function Lightning() {
     });
   }, []);
 
+  const handleDownload = (quality: 'low' | 'medium' | 'high') => {
+    if (!imageBlob) return;
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = () => {
+      let width, height;
+      switch (quality) {
+        case 'low':
+          width = 256;
+          height = 256;
+          break;
+        case 'medium':
+          width = 512;
+          height = 512;
+          break;
+        case 'high':
+          width = 1024;
+          height = 1024;
+          break;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      ctx?.drawImage(img, 0, 0, width, height);
+      
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `sage-ai-image-${quality}.jpg`;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      }, 'image/jpeg', 0.9);
+    };
+
+    img.src = URL.createObjectURL(imageBlob);
+  };
+
   return (
     <main>
-      <div className="flex flex-col justify-between h-[calc(100vh-56px)]">
+      <div className="flex flex-col justify-between min-h-[calc(100vh-56px)]">
         <div className="py-4 md:py-10 px-0 space-y-4 lg:space-y-8 mx-auto w-full max-w-xl">
+          <h1 className="text-center text-3xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-transparent bg-clip-text">
+            SAGE: Speedy AI Generation Engine
+          </h1>
           <div className="container px-3 md:px-0 flex flex-col space-y-2">
             <div className="flex flex-col max-md:space-y-4 md:flex-row md:space-x-4 max-w-full">
               <div className="flex-1 space-y-1">
@@ -128,25 +182,40 @@ export default function Lightning() {
                   <img id="imageDisplay" src={image} alt="Dynamic Image" />
                 )}
               </div>
+              {image && (
+                <div className="mt-4">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
+                        <DownloadIcon className="mr-2 h-4 w-4" />
+                        Download
+                        <ChevronDownIcon className="ml-2 h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => handleDownload('low')}>
+                        Low Quality
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDownload('medium')}>
+                        Medium Quality
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDownload('high')}>
+                        High Quality
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
             </div>
           </div>
         </div>
-        <div className="container flex flex-col items-center justify-center my-4">
-          <p className="text-sm text-base-content/70 py-4 text-center text-neutral-400">
-            This playground is hosted on{" "}
-            <strong>
-              <a href="https://fal.ai" className="underline" target="_blank">
-                fal.ai
-              </a>
-            </strong>{" "}
-            and is for demonstration purposes only.
+        <div className="container flex flex-col items-center justify-center my-4 space-y-2">
+          <p className="text-lg font-bold text-center bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 text-transparent bg-clip-text">
+            World's Fastest Text-to-Image Generator
           </p>
-          <div className="flex flex-row items-center space-x-2">
-            <span className="text-xs font-mono">powered by</span>
-            <Link href="https://fal.ai" target="_blank">
-              <ModelIcon />
-            </Link>
-          </div>
+          <p className="text-sm py-2 text-center bg-gradient-to-r from-pink-500 to-purple-500 text-transparent bg-clip-text font-semibold">
+            Created with 💓 by Manoj and Mithun
+          </p>
         </div>
       </div>
     </main>

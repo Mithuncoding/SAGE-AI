@@ -47,3 +47,11 @@ export default function RootLayout({
     </html>
   );
 }
+
+const DEFAULT_PROMPT =
+  "A cinematic shot of a baby raccoon wearing an intricate italian priest robe";
+
+function randomSeed() {
+  return Math.floor(Math.random() * 10000000).toFixed(0);
+}
+
