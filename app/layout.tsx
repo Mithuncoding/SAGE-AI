@@ -8,10 +8,10 @@ import { Analytics } from "@vercel/analytics/react";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "SDXL Lightning - by fal.ai",
-  description: "Lightning fast SDXL API demo by fal.ai",
-  authors: [{ name: "fal.ai", url: "https://fal.ai" }],
-  metadataBase: new URL("https://fastsdxl.ai"),
+  title: "SAGE",
+  description: "Speedy AI Generation Engine - Lightning fast text-to-image generation",
+  authors: [{ name: "Manoj and Mithun" }],
+  metadataBase: new URL("https://your-website-url.com"),
   openGraph: {
     images: "/og_thumbnail.jpeg",
   },
@@ -54,4 +54,3 @@ const DEFAULT_PROMPT =
 function randomSeed() {
   return Math.floor(Math.random() * 10000000).toFixed(0);
 }
-
