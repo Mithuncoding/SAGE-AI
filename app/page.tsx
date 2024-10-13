@@ -81,7 +81,7 @@ export default function Lightning() {
       prompt: prompt,
       seed: seed ? Number(seed) : Number(randomSeed()),
     });
-  }, []);
+  }, [connection, prompt, seed]);
 
   const handleDownload = (quality: 'low' | 'medium' | 'high') => {
     if (!imageBlob) return;
@@ -211,7 +211,7 @@ export default function Lightning() {
         </div>
         <div className="container flex flex-col items-center justify-center my-4 space-y-2">
           <p className="text-lg font-bold text-center bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 text-transparent bg-clip-text">
-            World's Fastest Text-to-Image Generator
+            World&apos;s Fastest Text-to-Image Generator
           </p>
           <p className="text-sm py-2 text-center bg-gradient-to-r from-pink-500 to-purple-500 text-transparent bg-clip-text font-semibold">
             Created with 💓 by Manoj and Mithun
