@@ -23,6 +23,7 @@ function randomSeed() {
 
 fal.config({
   proxyUrl: "/api/proxy",
+  credentials: process.env.FAL_KEY,
 });
 
 const INPUT_DEFAULTS = {
